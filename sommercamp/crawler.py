@@ -5,25 +5,24 @@ from scrapy.linkextractors.lxmlhtml import LxmlLinkExtractor
 from scrapy.http.response.html import HtmlResponse
 
 
-class SchoolSpider(Spider):
+class NewsSpider(Spider):
     # Gib hier dem Crawler einen eindeutigen Name,
     # der beschreibt, was du crawlst.
-    name = "school"
+    name = "news"
 
     start_urls = [
-        # Gib hier mindestens eine (oder mehrere) URLs an,
-        # bei denen der Crawler anfangen soll,
-        # Seiten zu downloaden.
-        "https://asg-erfurt.de/",
+        "https://www.tagesschau.de",
     ]
+
     link_extractor = LxmlLinkExtractor(
         # Beschränke den Crawler, nur Links zu verfolgen,
         # die auf eine der gelisteten Domains verweisen.
-        allow_domains=["asg-erfurt.de"],
+        allow_domains=["tagesschau.de"],
+        allow=[r'/id/']
     )
     custom_settings = {
         # Identifiziere den Crawler gegenüber den gecrawlten Seiten.
-        "USER_AGENT": "Sommercamp (https://uni-jena.de)",
+        "USER_AGENT": "Informatik Sommercamp (https://uni-jena.de)",
         # Der Crawler soll nur Seiten crawlen, die das auch erlauben.
         "ROBOTSTXT_OBEY": True,
         # Frage zu jeder Zeit höchstens 4 Webseiten gleichzeitig an.
@@ -40,7 +39,7 @@ class SchoolSpider(Spider):
         if not isinstance(response, HtmlResponse):
             # Die Webseite ist keine HTML-Webseite, enthält also keinen Text.
             return
-        
+
         # Speichere die Webseite als ein Dokument in unserer Dok.-sammlung.
         yield {
             # Eine eindeutige Identifikations-Nummer für das Dokument.
@@ -53,6 +52,7 @@ class SchoolSpider(Spider):
             # Um den Hauptinhalt zu extrahieren, benutzen wir
             # eine externe Bibliothek.
             "text": extract_plain_text(response.text, main_content=True),
+            "date": response.css("meta[name=date]::text").get()
         }
 
         # Finde alle Links auf der aktuell betrachteten Webseite.
