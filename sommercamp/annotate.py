@@ -1,7 +1,7 @@
 import json
 
 
-class AnnotateService():
+class AnnotationService():
     def __init__(self):
         self.sentiws = 'data/sentiws.json'
         self.sentimental_value = 0

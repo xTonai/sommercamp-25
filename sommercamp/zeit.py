@@ -11,14 +11,27 @@ class NewsSpider(Spider):
     name = "news"
 
     start_urls = [
-        "https://www.tagesschau.de",
+        "https://www.zeit.de",
     ]
 
     link_extractor = LxmlLinkExtractor(
         # Beschränke den Crawler, nur Links zu verfolgen,
         # die auf eine der gelisteten Domains verweisen.
-        allow_domains=["tagesschau.de"],
-        allow=[r'/id/']
+        allow_domains=["zeit.de"],
+        allow=[
+            r'/politik/',
+            r'/wirtschaft/',
+            r'/geld/',
+            r'/gesellschaft/',
+            r'/kultur/',
+            r'/gesundheit/',
+            r'/digital/',
+            r'/mobilität/',
+            r'/arbeit/',
+            r'/wissen/',
+            r'/sport/',
+            r'/familie/'
+        ]
     )
     custom_settings = {
         # Identifiziere den Crawler gegenüber den gecrawlten Seiten.
@@ -52,7 +65,9 @@ class NewsSpider(Spider):
             # Um den Hauptinhalt zu extrahieren, benutzen wir
             # eine externe Bibliothek.
             "text": extract_plain_text(response.text, main_content=True),
-            "date": response.css("meta[name=date]::text").get()
+            "date": response.css(
+                "meta[name=\"last-modified\"]::attr(content)"
+            ).get()
         }
 
         # Finde alle Links auf der aktuell betrachteten Webseite.

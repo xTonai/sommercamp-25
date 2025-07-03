@@ -1,12 +1,12 @@
 import json
 import re
 
+from sommercamp.annotate import AnnotationService
+
 
 class Indexer():
     def __init__(self, documents):
         self.documents = documents
-        with open('data/stopwords.json', "r") as f:
-            self.stopwords = json.load(f)
         self.documents_list = []
 
     def index(self):
@@ -15,14 +15,11 @@ class Indexer():
                 document = json.loads(line)
                 self.documents_list.append(document)
         for document in self.documents_list:
-            text = document["text"]
-            text = re.split(r'[\s\t\n]+', text)
-            for word in text:
-                if word.lower().strip('.,;:!?()"[]{}<>') in self.stopwords:
-                    text.remove(word)
-                else:
-                    text[text.index(word)] = word.lower().strip('.,;:!?()"[]{}<>')
-            print(text)
+            print(f"Indexing document: {document['docno']}")
+            text = re.split(r'[\s\t\n]+', document["text"])
+            score = AnnotationService().annotate(text)
+            document["score"] = score
+            print(f"Document {document['docno']} has score: {score}")
 
 
 Indexer = Indexer("data/documents.jsonl")
