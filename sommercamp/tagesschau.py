@@ -5,21 +5,21 @@ from scrapy.linkextractors.lxmlhtml import LxmlLinkExtractor
 from scrapy.http.response.html import HtmlResponse
 
 
-class SchoolSpider(Spider):
+class TagesschauSpider(Spider):
     # Gib hier dem Crawler einen eindeutigen Name,
     # der beschreibt, was du crawlst.
-    name = "school"
+    name = "tagesschau"
 
     start_urls = [
         # Gib hier mindestens eine (oder mehrere) URLs an,
         # bei denen der Crawler anfangen soll,
         # Seiten zu downloaden.
-        "https://asg-erfurt.de/",
+        "https://tagesschau.de/",
     ]
     link_extractor = LxmlLinkExtractor(
         # Beschränke den Crawler, nur Links zu verfolgen,
         # die auf eine der gelisteten Domains verweisen.
-        allow_domains=["asg-erfurt.de"],
+        allow_domains=["tagesschau.de"],
     )
     custom_settings = {
         # Identifiziere den Crawler gegenüber den gecrawlten Seiten.
@@ -41,7 +41,7 @@ class SchoolSpider(Spider):
             # Die Webseite ist keine HTML-Webseite, enthält also keinen Text.
             return
         
-        # Speichere die Webseite als ein Dokument in unserer Dok.-sammlung.
+        # Speichere die Webseite als ein Dokument in unserer Dokumentensammlung.
         yield {
             # Eine eindeutige Identifikations-Nummer für das Dokument.
             "docno": str(hash(response.url)),
