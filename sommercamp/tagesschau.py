@@ -59,7 +59,12 @@ class NewsSpider(Spider):
             # Um den Hauptinhalt zu extrahieren, benutzen wir
             # eine externe Bibliothek.
             "text": extract_plain_text(response.text, main_content=True),
-            "date": response.css("meta[name=\"date\"]::attr(content)").get()
+            "date": response.css(
+                "meta[name=\"date\"]::attr(content)"
+            ).get(),
+            "tags": response.css(
+                "meta[name=\"keywords\"]::attr(content)"
+            ).get().split(", ")
         }
 
         # Finde alle Links auf der aktuell betrachteten Webseite.

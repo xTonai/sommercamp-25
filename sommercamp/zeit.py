@@ -67,7 +67,10 @@ class NewsSpider(Spider):
             "text": extract_plain_text(response.text, main_content=True),
             "date": response.css(
                 "meta[name=\"last-modified\"]::attr(content)"
-            ).get()
+            ).get(),
+            "tags": response.css(
+                "meta[name=\"keywords\"]::attr(content)"
+            ).get().split(", ")
         }
 
         # Finde alle Links auf der aktuell betrachteten Webseite.

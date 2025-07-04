@@ -40,21 +40,25 @@ class NewsSpider(Spider):
             return
 
         # Speichere die Webseite als ein Dokument in unserer Dok.-sammlung.
-        yield {
-            # Eine eindeutige Identifikations-Nummer für das Dokument.
-            "docno": str(hash(response.url)),
-            # Die URL der Webseite.
-            "url": response.url,
-            # Der Titel der Webseite aus dem <title> Tag im HTML-Code.
-            "title": response.css("title::text").get(),
-            # Der Text der Webseite.
-            # Um den Hauptinhalt zu extrahieren, benutzen wir
-            # eine externe Bibliothek.
-            "text": extract_plain_text(response.text, main_content=True),
-            "date": response.css(
-                "meta[property=\"article:published_time\"]::attr(content)"
-            ).get()
-        }
+        if not (response.css("meta[property=\"article:published_time\"]::attr(content)").get() is None or response.css("meta[property=\"article:tag\"]::attr(content)").getall() == []):
+            yield {
+                # Eine eindeutige Identifikations-Nummer für das Dokument.
+                "docno": str(hash(response.url)),
+                # Die URL der Webseite.
+                "url": response.url,
+                # Der Titel der Webseite aus dem <title> Tag im HTML-Code.
+                "title": response.css("title::text").get(),
+                # Der Text der Webseite.
+                # Um den Hauptinhalt zu extrahieren, benutzen wir
+                # eine externe Bibliothek.
+                "text": extract_plain_text(response.text, main_content=True),
+                "date": response.css(
+                    "meta[property=\"article:published_time\"]::attr(content)"
+                ).get(),
+                "tags": response.css(
+                    "meta[property=\"article:tag\"]::attr(content)"
+                ).getall()
+            }
 
         # Finde alle Links auf der aktuell betrachteten Webseite.
         for link in self.link_extractor.extract_links(response):
