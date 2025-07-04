@@ -1,4 +1,5 @@
 # Hier importieren wir die benötigten Softwarebibliotheken.
+from datetime import datetime
 from os.path import abspath, exists
 from sys import argv
 from streamlit import (text_input, header, title, subheader, container, markdown, link_button, divider, set_page_config)
@@ -18,9 +19,30 @@ class CustomScorer(TransformerBase):
         super().__init__()
 
     def transform(self, run):
-        run['score'] = run['score'] * (
-            run['recency'].astype(float) - 1136070000
-        )
+        if int(run['recency']) >= (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds() - 259200:
+            run['score'] = run['score'] * (
+                run['recency'].astype(float) - 1136070000
+            ) * 25
+        elif int(run['recency']) >= (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds() - 604800:
+            run['score'] = run['score'] * (
+                run['recency'].astype(float) - 1136070000
+            ) * 15
+        elif int(run['recency']) >= (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds() - 1209600:
+            run['score'] = run['score'] * (
+                run['recency'].astype(float) - 1136070000
+            ) * 10
+        elif int(run['recency']) >= (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds() - 2629743:
+            run['score'] = run['score'] * (
+                run['recency'].astype(float) - 1136070000
+            ) * 5
+        elif int(run['recency']) >= (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds() - 31556926:
+            run['score'] = run['score'] * (
+                run['recency'].astype(float) - 1136070000
+            ) * 2
+        else:
+            run['score'] = run['score'] * (
+                run['recency'].astype(float) - 1136070000
+            )
 
         return run
 
