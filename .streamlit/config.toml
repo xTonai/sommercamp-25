@@ -15,4 +15,24 @@ gatherUsageStats = false
 [ui]
 hideTopBar = true
 
+[theme]
+
+# Primary accent for interactive elements
+primaryColor = '#83c8a7'
+
+# Background color for the main content area
+backgroundColor = '#1b212c'
+
+# Background color for sidebar and most interactive widgets
+secondaryBackgroundColor = '#232935'
+
+# Color used for almost all text
+textColor = '#FFFFFF'
+
+# Font family for all text in the app, except code blocks
+# Accepted values (serif | sans serif | monospace) 
+# Default: "sans serif"
+font = "sans serif"
+
+
 # Eigene Einstellungen kannst du unterhalb dieser Zeile einfügen.
