@@ -24,27 +24,26 @@ class CustomScorer(TransformerBase):
         super().__init__()
 
     def transform(self, run):
-        now_seconds = (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
+        now = datetime.now().timestamp()
 
         def score_row(row):
             recency = float(row["recency"])
             score = row["score"]
-            base = recency - 1136070000
 
-            if recency >= now_seconds - 259200:         # letzte 3 Tage
+            if recency >= now - 259200:         # letzte 3 Tage
                 factor = 25
-            elif recency >= now_seconds - 604800:       # letzte Woche
+            elif recency >= now - 604800:       # letzte Woche
                 factor = 15
-            elif recency >= now_seconds - 1209600:      # letzte 2 Wochen
+            elif recency >= now - 1209600:      # letzte 2 Wochen
                 factor = 10
-            elif recency >= now_seconds - 2629743:      # letzter Monat
+            elif recency >= now - 2629743:      # letzter Monat
                 factor = 5
-            elif recency >= now_seconds - 31556926:     # letztes Jahr
+            elif recency >= now - 31556926:     # letztes Jahr
                 factor = 2
             else:
-                return 0  # sehr alte Dokumente rausfiltern
+                factor = 1 // 10**9  # alles ältere
 
-            return score * base * factor
+            return score * factor
 
         # Scoring anwenden
         run["score"] = run.apply(score_row, axis=1)
@@ -85,7 +84,10 @@ def app(index_dir) -> None:
         num_results=1000,  # hole mehr Kandidaten
     )
 
-    text_getter = get_text(index, metadata=["url", "title", "text", "tags", "recency"])
+    text_getter = get_text(
+        index,
+        metadata=["url", "title", "text", "tags", "recency"]
+    )
     scorer = CustomScorer()
     pipeline = searcher >> text_getter >> scorer
     results = pipeline.search(query)
@@ -99,12 +101,18 @@ def app(index_dir) -> None:
 
     # Zeige maximal 15 Ergebnisse
     max_results = min(len(results), 15)
-    markdown(f"{max_results} Ergebnisse angezeigt (von {len(results)} gefunden).")
+    markdown(
+        f"{max_results} Ergebnisse angezeigt (von {len(results)} gefunden)."
+    )
 
     for _, row in results.head(max_results).iterrows():
         with container(border=True):
-            title_text = row["title"] if isinstance(row["title"], str) else "(Kein Titel vorhanden)"
-            text = row["text"] if isinstance(row["text"], str) else "(Kein Text verfügbar)"
+            title_text = row["title"] if isinstance(row["title"], str) else (
+                "(Kein Titel vorhanden)"
+            )
+            text = row["text"] if isinstance(row["text"], str) else (
+                "(Kein Text verfügbar)"
+            )
             url = row["url"] if isinstance(row["url"], str) else "#"
 
             text = text[:500].replace("\n", " ")

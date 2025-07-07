@@ -11,7 +11,6 @@ from dateutil import parser
 if not started():
     init()
 from pyterrier.index import IterDictIndexer
-import pandas as pd 
 
 
 # Diese Funktion liest jedes Dokument aus der Dokumenten-Sammlung ein
@@ -79,4 +78,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
